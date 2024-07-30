@@ -52,23 +52,27 @@ class TencentRequest(object):
     def get_course_info(self, cid, tid, vid, qq, r: clarityResolution = clarityResolution.LOW):
         m3u8_url = ""
         course_url = "https://ke.qq.com/cgi-proxy/rec_video/describe_rec_video?course_id=" + cid + "&file_id=" + vid + "&header=%7B%22srv_appid%22%3A201%2C%22cli_appid%22%3A%22ke%22%2C%22uin%22%3A%22" + qq + "%22%2C%22cli_info%22%3A%7B%22cli_platform%22%3A3%7D%7D&term_id=" + tid + "&vod_type=0"
-
-        res = requests.get(course_url, headers=self.header).text
-        course_info = json.loads(res)
-        video_list = course_info['result']['rec_video_info']['infos']
-        video_list.sort(key=lambda x: x['size'])
-        if r == clarityResolution.LOW:
-            m3u8_url = video_list[0].get('url')
-        elif r == clarityResolution.HIGH:
-            m3u8_url = video_list[-1].get('url')
-        elif r == clarityResolution.MID:
-            length = len(video_list)
-            if length == 3:
-                m3u8_url = video_list[1].get('url')
-            elif length < 3:
+        try:
+            res = requests.get(course_url, headers=self.header).text
+            course_info = json.loads(res)
+            video_list = course_info['result']['rec_video_info']['infos']
+            video_list.sort(key=lambda x: x['size'])
+            if r == clarityResolution.LOW:
                 m3u8_url = video_list[0].get('url')
-            else:
-                m3u8_url = video_list[int(length / 2)].get('url')
+            elif r == clarityResolution.HIGH:
+                m3u8_url = video_list[-1].get('url')
+            elif r == clarityResolution.MID:
+                length = len(video_list)
+                if length == 3:
+                    m3u8_url = video_list[1].get('url')
+                elif length < 3:
+                    m3u8_url = video_list[0].get('url')
+                else:
+                    m3u8_url = video_list[int(length / 2)].get('url')
 
-        sign = course_info['result']['rec_video_info']['d_sign']
-        return m3u8_url, sign
+            sign = course_info['result']['rec_video_info']['d_sign']
+            return m3u8_url, sign
+        except Exception as e:
+            print(e)
+            logger.error(f'get_course_info failed, error = ${str(e)}')
+            return None, None

@@ -57,6 +57,8 @@ class TencentClassDownloader(object):
                         if isinstance(resid_list, str):
                             video_id = resid_list
                             m3u8_url, sign = t.get_course_info(cid, term_id_list, video_id, self.qq, self.clarity)
+                            if m3u8_url is None or sign is None:
+                                continue
                             download_info = {
                                 'course_name': course_name,
                                 'cid': cid,
@@ -70,7 +72,10 @@ class TencentClassDownloader(object):
                         elif isinstance(resid_list, list):
                             for resid in resid_list:
                                 video_id = resid
+
                                 m3u8_url, sign = t.get_course_info(cid, term_id_list, video_id, self.qq, self.clarity)
+                                if m3u8_url is None or sign is None:
+                                    continue
                                 if len(resid_list) > 1:
                                     c_name = course_name + '_' + video_id
                                 else:
