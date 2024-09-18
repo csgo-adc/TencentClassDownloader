@@ -3,8 +3,6 @@ import json
 import logging
 from enum import Enum
 
-from download_manager import M3U8Downloader
-
 logging.basicConfig(filename='log/output.log',
                     level=logging.INFO,
                     datefmt='%Y/%m/%d %H:%M:%S',
@@ -34,7 +32,7 @@ class TencentRequest(object):
     def load_cookie(self):
         try:
             with open('cookie', 'r') as f:
-                self.cookie = f.read()
+                self.cookie = f.read().strip()
         except Exception as e:
             print("load cookie failed")
             logger.error(e)
