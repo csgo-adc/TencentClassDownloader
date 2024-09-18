@@ -1,20 +1,31 @@
-## TencentClassDownloader
+# `TencentClassDownloader`
 腾讯课堂视频下载脚本
 
-## 开始
-### 1、配置环境
-运行环境 Python3
+视频教程:[大型纪录片：腾讯课堂关服了，课程保存方法快来学习，超级简单
+](https://www.bilibili.com/video/BV1uTvCeDEjk)
+
+# 开始
+## 1、配置环境(两种方式)
+
+### ①Python环境运行
+
+运行环境 Python3,我测试时的版本是Python3.8
 
 #### 安装依赖
 ```
 pip install -r requirements.txt
 ```
 
-### 2、获取cookie
+### ②直接运行
+
+配置好cookie和config.conf,直接运行目录下的main.exe
+
+
+## 2、获取cookie
 以谷歌浏览器为例，打开腾讯视频并登陆，键盘F12，找到network——点击Doc（如果没有数据，刷新一下界面），找到cookie等信息，拷贝粘贴到目录下的cookie文件中
 
 
-### 3、配置conf
+## 3、配置conf
 修改目录中到config.conf文件，
 
 ```
@@ -35,8 +46,14 @@ clarity = 1
 ```
 
 
-### 4、运行main.py
+## 4、运行main.py或者main.exe
 ```
 python3 main.py
+或
+main.exe
 ```
 等着下载完成就可以了，下载过的视频会自动跳过，如需重新下载请删除原来的视频。
+
+# 结束
+
+交流群[https://t.me/teleportmmm]
