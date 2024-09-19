@@ -92,7 +92,10 @@ class TencentClassDownloader(object):
 
     def download(self):
         for video_info in tqdm(self.download_list):
-            file_name = self.save_path + video_info['course_name'] + '_' + video_info['video_id'] + '.mp4'
+            video_name = video_info['course_name']
+            video_name = video_name.replace('/', '_').replace('?', '_').replace(' ', '_').replace("\\", "_").replace("/", "_")
+
+            file_name = self.save_path + video_name + '_' + video_info['video_id'] + '.mp4'
             m3u8_url = video_info['m3u8_url']
             sign = video_info['sign']
             if os.path.exists(file_name):
