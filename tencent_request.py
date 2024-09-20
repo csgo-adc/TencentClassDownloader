@@ -1,7 +1,13 @@
+import os
+
 import requests
 import json
 import logging
 from enum import Enum
+
+# 检测log文件夹是否存在，不存在则创建
+if not os.path.exists('log'):
+    os.mkdir('log')
 
 logging.basicConfig(filename='log/output.log',
                     level=logging.INFO,
