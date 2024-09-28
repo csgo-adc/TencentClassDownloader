@@ -4,6 +4,7 @@ import re
 import requests
 import threading
 import os
+import time
 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
@@ -51,19 +52,46 @@ class M3U8Downloader:
                 self.ts_files.append(ts_url)
                 self.queue.put(ts_url)
 
-    def download_ts(self):
+    def download_ts(self, max_retries=5, retry_delay=5):
         while not self.queue.empty():
             ts_url = self.queue.get()
             ts_filename = ts_url.split("/")[-1].split('&')[0].replace('?', '_')
-            response = requests.get(ts_url)
-            response.raise_for_status()
-            cont = self.cryptor.decrypt(response.content)
+            retries = 0
 
-            with open('tmp/' + ts_filename, 'wb') as f:
-                f.write(cont)
-            self.queue.task_done()
-            if self.progress_bar:
-                self.progress_bar.update(1)
+            while retries < max_retries:
+                try:
+                    # 下载文件
+                    response = requests.get(ts_url, timeout=10)
+                    response.raise_for_status()  # 如果状态码不是200，则抛出异常
+                    
+                    # 解密内容
+                    cont = self.cryptor.decrypt(response.content)
+
+                    # 检查 tmp/ 目录是否存在，不存在则创建
+                    if not os.path.exists('tmp'):
+                        os.makedirs('tmp')
+
+                    # 写入解密后的内容到文件
+                    with open('tmp/' + ts_filename, 'wb') as f:
+                        f.write(cont)
+
+                    # 完成当前任务，退出重试循环
+                    self.queue.task_done()
+                    
+                    # 更新进度条
+                    if self.progress_bar:
+                        self.progress_bar.update(1)
+                    
+                    break  # 成功下载后退出重试循环
+                
+                except requests.exceptions.RequestException as e:
+                    retries += 1
+                    print(f"下载 {ts_filename} 时发生错误: {e}，正在重试 {retries}/{max_retries}...")
+                    if retries >= max_retries:
+                        print(f"重试次数已达最大，放弃下载 {ts_filename}")
+                        self.queue.task_done()  # 标记任务已完成，防止任务卡住
+                        break
+                    time.sleep(retry_delay)  # 等待一段时间后再重试
 
     def merge_ts(self):
         with open(self.output_file, 'wb') as output_file:
